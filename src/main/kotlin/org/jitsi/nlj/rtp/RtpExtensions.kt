@@ -78,9 +78,21 @@ enum class RtpExtensionType(val uri: String) {
 
     /**
      * The URN which identifies the rtp-stream-id extensions
-     * in {@link "https://tools.ietf.org/html/draft-ietf-mmusic-rid-10"}.
+     * in {@link "https://www.rfc-editor.org/rfc/rfc8852.html"}.
      */
     RTP_STREAM_ID("urn:ietf:params:rtp-hdrext:sdes:rtp-stream-id"),
+
+    /**
+     * The URN which identifies the rtp--repair-stream-id extensions
+     * in {@link "https://www.rfc-editor.org/rfc/rfc8852.html"}.
+     */
+    RTP_REPAIR_STREAM_ID("urn:ietf:params:rtp-hdrext:sdes:repaired-rtp-stream-id"),
+
+    /**
+     * The URN which identifies the media identification extensions
+     * in {@link ""https://www.rfc-editor.org/rfc/rfc8843.html}
+     */
+    MEDIA_IDENTIFICATION("urn:ietf:params:rtp-hdrext:sdes:mid"),
 
     /**
      * The URN which identifies the transmission time-offset extensions

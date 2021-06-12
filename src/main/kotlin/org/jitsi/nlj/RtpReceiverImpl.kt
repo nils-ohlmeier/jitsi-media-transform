@@ -56,11 +56,10 @@ import org.jitsi.nlj.transform.node.incoming.TccGeneratorNode
 import org.jitsi.nlj.transform.node.incoming.VideoBitrateCalculator
 import org.jitsi.nlj.transform.node.incoming.VideoParser
 import org.jitsi.nlj.transform.node.incoming.VideoMuteNode
+import org.jitsi.nlj.transform.node.incoming.MidReceiverNode
 import org.jitsi.nlj.transform.packetPath
 import org.jitsi.nlj.transform.pipeline
-import org.jitsi.nlj.util.PacketInfoQueue
-import org.jitsi.nlj.util.PacketPredicate
-import org.jitsi.nlj.util.ReadOnlyStreamInformationStore
+import org.jitsi.nlj.util.*
 import org.jitsi.utils.logging2.cdebug
 import org.jitsi.utils.logging2.createChildLogger
 import org.jitsi.rtp.Packet
@@ -70,9 +69,6 @@ import org.jitsi.rtp.rtcp.RtcpPacket
 import org.jitsi.utils.logging.DiagnosticContext
 import org.jitsi.utils.logging2.Logger
 import org.jitsi.utils.queue.CountingErrorHandler
-
-import org.jitsi.nlj.util.Bandwidth
-import org.jitsi.nlj.util.BufferPool
 
 class RtpReceiverImpl @JvmOverloads constructor(
     val id: String,
@@ -93,7 +89,7 @@ class RtpReceiverImpl @JvmOverloads constructor(
      * background tasks, or tasks that need to execute at some fixed delay/rate
      */
     private val backgroundExecutor: ScheduledExecutorService,
-    streamInformationStore: ReadOnlyStreamInformationStore,
+    streamInformationStore: StreamInformationStoreImpl,
     private val eventHandler: RtpReceiverEventHandler,
     parentLogger: Logger,
     diagnosticContext: DiagnosticContext = DiagnosticContext()
@@ -111,6 +107,7 @@ class RtpReceiverImpl @JvmOverloads constructor(
     private val srtpDecryptWrapper = SrtpDecryptNode()
     private val srtcpDecryptWrapper = SrtcpDecryptNode()
     private val tccGenerator = TccGeneratorNode(rtcpSender, streamInformationStore, logger)
+    private val midTracker = MidReceiverNode(streamInformationStore, logger)
     private val remoteBandwidthEstimator = RemoteBandwidthEstimator(streamInformationStore, logger, diagnosticContext)
     private val audioLevelReader = AudioLevelReader(streamInformationStore).apply {
         audioLevelListener = object : AudioLevelListener {
@@ -218,6 +215,7 @@ class RtpReceiverImpl @JvmOverloads constructor(
                         node(srtpDecryptWrapper)
                         node(toggleablePcapWriter.newObserverNode())
                         node(statsTracker)
+                        node(midTracker)
                         node(PaddingTermination(logger))
                         demux("Media Type") {
                             packetPath {

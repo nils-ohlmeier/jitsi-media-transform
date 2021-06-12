@@ -45,6 +45,7 @@ class KeyframeRequesterTest : ShouldSpec() {
     private val streamInformationStore = object : ReadOnlyStreamInformationStore {
         override val rtpExtensions: List<RtpExtension> = mutableListOf()
         override val rtpPayloadTypes: Map<Byte, PayloadType> = mutableMapOf()
+        override var mid: String = "1"
         override var supportsFir: Boolean = true
         override var supportsPli: Boolean = true
         override val supportsRemb: Boolean = true

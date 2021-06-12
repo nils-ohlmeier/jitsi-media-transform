@@ -55,6 +55,13 @@ interface ReadOnlyStreamInformationStore : NodeStatsProducer {
     fun getRemoteSecondarySsrc(primarySsrc: Long, associationType: SsrcAssociationType): Long?
 
     /**
+     * The MID string identifying the RTP stream
+     * This value should be set via signaling, but we currently lack
+     * a way to get this information in here.
+     */
+    val mid: String
+
+    /**
      * All signaled receive SSRCs
      */
     val receiveSsrcs: Set<Long>
@@ -93,6 +100,8 @@ interface StreamInformationStore : ReadOnlyStreamInformationStore {
 
     fun addReceiveSsrc(ssrc: Long, mediaType: MediaType)
     fun removeReceiveSsrc(ssrc: Long)
+
+    var receivedMid: Boolean
 }
 
 class StreamInformationStoreImpl : StreamInformationStore {
@@ -119,6 +128,8 @@ class StreamInformationStoreImpl : StreamInformationStore {
     override val primaryVideoSsrcs: Set<Long>
         get() = receiveSsrcStore.primaryVideoSsrcs
 
+    override val mid: String = ""
+
     // Support for FIR, PLI, REMB and TCC is declared per-payload type, but currently our code is not payload-type
     // aware. So until this changes we will just check if any of the PTs supports the relevant feedback.
     // We always assume support for FIR.
@@ -133,6 +144,8 @@ class StreamInformationStoreImpl : StreamInformationStore {
 
     override var supportsTcc: Boolean = false
         private set
+
+    override var receivedMid: Boolean = false
 
     override fun addRtpExtensionMapping(rtpExtension: RtpExtension) {
         synchronized(extensionsLock) {
