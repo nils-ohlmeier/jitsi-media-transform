@@ -51,6 +51,7 @@ import org.jitsi.nlj.transform.node.outgoing.RetransmissionSender
 import org.jitsi.nlj.transform.node.outgoing.SentRtcpStats
 import org.jitsi.nlj.transform.node.outgoing.HeaderExtStripper
 import org.jitsi.nlj.transform.node.outgoing.TccSeqNumTagger
+import org.jitsi.nlj.transform.node.outgoing.MidSenderNode
 import org.jitsi.nlj.transform.pipeline
 import org.jitsi.nlj.util.PacketInfoQueue
 import org.jitsi.nlj.util.StreamInformationStore
