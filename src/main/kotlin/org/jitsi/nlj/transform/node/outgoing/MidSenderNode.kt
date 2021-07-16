@@ -4,6 +4,8 @@ import org.jitsi.nlj.PacketInfo
 import org.jitsi.nlj.rtp.RtpExtensionType
 import org.jitsi.nlj.transform.node.ModifierNode
 import org.jitsi.nlj.util.StreamInformationStore
+import org.jitsi.rtp.rtp.RtpPacket
+import org.jitsi.rtp.rtp.header_extensions.SdesHeaderExtension
 import org.jitsi.utils.logging2.Logger
 import org.jitsi.utils.logging2.createChildLogger
 
@@ -12,6 +14,7 @@ class MidSenderNode(
     parentLogger: Logger
 ) : ModifierNode("MID sender") {
     private var midExtId: Int? = null
+    private var midValue: String = "test"
     private val logger = createChildLogger(parentLogger)
     private val streamInfo = streamInformationStore
 
@@ -23,10 +26,16 @@ class MidSenderNode(
     }
 
     override fun modify(packetInfo: PacketInfo): PacketInfo {
-        TODO("Not yet implemented")
+        logger.error("MID Sender Node: modify() called")
+        midExtId?.let { midId ->
+            logger.error("MID Sender Node: midExtId is set to $midId")
+            val rtpPacket = packetInfo.packetAs<RtpPacket>()
+            val ext = rtpPacket.getHeaderExtension(midId)
+                ?: rtpPacket.addHeaderExtension(midId, midValue.length - 1)
+            SdesHeaderExtension.setTextValue(ext, midValue)
+        }
+        return packetInfo
     }
 
-    override fun trace(f: () -> Unit) {
-        TODO("Not yet implemented")
-    }
+    override fun trace(f: () -> Unit) = f.invoke()
 }
