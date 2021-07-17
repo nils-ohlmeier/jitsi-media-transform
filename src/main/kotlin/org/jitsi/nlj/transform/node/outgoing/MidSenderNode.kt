@@ -31,8 +31,9 @@ class MidSenderNode(
             logger.error("MID Sender Node: midExtId is set to $midId")
             val rtpPacket = packetInfo.packetAs<RtpPacket>()
             val ext = rtpPacket.getHeaderExtension(midId)
-                ?: rtpPacket.addHeaderExtension(midId, midValue.length - 1)
+                ?: rtpPacket.addHeaderExtension(midId, midValue.length)
             SdesHeaderExtension.setTextValue(ext, midValue)
+            logger.error("MID Sender Node: MID value set to $midValue")
         }
         return packetInfo
     }
