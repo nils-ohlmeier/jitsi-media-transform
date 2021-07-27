@@ -190,6 +190,11 @@ class Transceiver(
         streamInformationStore.removeReceiveSsrc(ssrc)
     }
 
+    fun setMediaId(mid: String) {
+        logger.cinfo { "Transceiver ${hashCode()} setting MID to $mid" }
+        streamInformationStore.mid = mid
+    }
+
     /**
      * Set the 'local' bridge SSRC to [ssrc] for [mediaType]
      */
