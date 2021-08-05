@@ -55,9 +55,7 @@ interface ReadOnlyStreamInformationStore : NodeStatsProducer {
     fun getRemoteSecondarySsrc(primarySsrc: Long, associationType: SsrcAssociationType): Long?
 
     /**
-     * The MID string identifying the RTP stream
-     * This value should be set via signaling, but we currently lack
-     * a way to get this information in here.
+     * The MID string identifying the RTP stream.
      */
     val mid: String
 
