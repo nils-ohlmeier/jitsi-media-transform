@@ -195,6 +195,10 @@ class Transceiver(
         streamInformationStore.mid = mid
     }
 
+    fun getMediaId(): String {
+        return streamInformationStore.mid
+    }
+
     /**
      * Set the 'local' bridge SSRC to [ssrc] for [mediaType]
      */
