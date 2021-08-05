@@ -14,13 +14,13 @@ class MidSenderNode(
     parentLogger: Logger
 ) : ModifierNode("MID sender") {
     private var midExtId: Int? = null
-    private var midValue: String = "test"
+    private var midValue: String = "null"
     private val logger = createChildLogger(parentLogger)
     private val streamInfo = streamInformationStore
 
     init {
         logger.error("MID Sender Node: init called")
-        streamInformationStore.onRtpExtensionMapping(RtpExtensionType.MEDIA_IDENTIFICATION) {
+        streamInfo.onRtpExtensionMapping(RtpExtensionType.MEDIA_IDENTIFICATION) {
             midExtId = it
         }
     }
@@ -30,6 +30,9 @@ class MidSenderNode(
         midExtId?.let { midId ->
             logger.error("MID Sender Node: midExtId is set to $midId")
             val rtpPacket = packetInfo.packetAs<RtpPacket>()
+            if (streamInfo.mid.isNotEmpty()) {
+                midValue = streamInfo.mid
+            }
             val ext = rtpPacket.getHeaderExtension(midId)
                 ?: rtpPacket.addHeaderExtension(midId, midValue.length)
             SdesHeaderExtension.setTextValue(ext, midValue)
