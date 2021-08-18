@@ -14,29 +14,32 @@ class MidSenderNode(
     parentLogger: Logger
 ) : ModifierNode("MID sender") {
     private var midExtId: Int? = null
-    private var midValue: String = "null"
+    private var midValue: String? = null
     private val logger = createChildLogger(parentLogger)
     private val streamInfo = streamInformationStore
 
     init {
-        logger.error("MID Sender Node: init called")
+        // logger.error("MID Sender Node: init called")
         streamInfo.onRtpExtensionMapping(RtpExtensionType.MEDIA_IDENTIFICATION) {
             midExtId = it
         }
     }
 
     override fun modify(packetInfo: PacketInfo): PacketInfo {
-        logger.error("MID Sender Node: modify() called")
+        // logger.error("MID Sender Node: modify() called")
         midExtId?.let { midId ->
-            logger.error("MID Sender Node: midExtId is set to $midId")
+            logger.error("MID Sender Node ${hashCode()}: midExtId is set to $midId")
             val rtpPacket = packetInfo.packetAs<RtpPacket>()
-            if (streamInfo.mid.isNotEmpty()) {
-                midValue = streamInfo.mid
+            midValue = streamInfo.getMidBySsrc(rtpPacket.ssrc)
+            if (midValue.isNullOrEmpty()) {
+                logger.error("${hashCode()} missing MID value for SSRC ${rtpPacket.ssrc}")
+                logger.error("${hashCode()} MID Association store: ${streamInfo.dumpMidAssociationStore()}")
+                return packetInfo
             }
             val ext = rtpPacket.getHeaderExtension(midId)
-                ?: rtpPacket.addHeaderExtension(midId, midValue.length)
-            SdesHeaderExtension.setTextValue(ext, midValue)
-            logger.error("MID Sender Node: MID value set to $midValue")
+                ?: rtpPacket.addHeaderExtension(midId, midValue!!.length)
+            SdesHeaderExtension.setTextValue(ext, midValue!!)
+            logger.error("MID Sender Node ${hashCode()}: MID value set to $midValue")
         }
         return packetInfo
     }

@@ -45,7 +45,6 @@ class KeyframeRequesterTest : ShouldSpec() {
     private val streamInformationStore = object : ReadOnlyStreamInformationStore {
         override val rtpExtensions: List<RtpExtension> = mutableListOf()
         override val rtpPayloadTypes: Map<Byte, PayloadType> = mutableMapOf()
-        override var mid: String = "1"
         override var supportsFir: Boolean = true
         override var supportsPli: Boolean = true
         override val supportsRemb: Boolean = true
@@ -64,6 +63,14 @@ class KeyframeRequesterTest : ShouldSpec() {
         override fun getLocalPrimarySsrc(secondarySsrc: Long): Long? = null
 
         override fun getRemoteSecondarySsrc(primarySsrc: Long, associationType: SsrcAssociationType): Long? = null
+
+        override fun getMidBySsrc(ssrc: Long): String? {
+            return null
+        }
+
+        override fun dumpMidAssociationStore(): String {
+            return ""
+        }
 
         override fun getNodeStats(): NodeStatsBlock = NodeStatsBlock("dummy")
     }

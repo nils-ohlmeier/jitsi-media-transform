@@ -18,6 +18,7 @@ package org.jitsi.nlj.transform.node.incoming
 import org.jitsi.nlj.PacketInfo
 import org.jitsi.nlj.rtp.RtpExtensionType
 import org.jitsi.nlj.transform.node.ObserverNode
+import org.jitsi.nlj.util.MidAssociation
 import org.jitsi.nlj.util.StreamInformationStoreImpl
 import org.jitsi.rtp.rtp.RtpPacket
 import org.jitsi.rtp.rtp.header_extensions.SdesHeaderExtension
@@ -45,9 +46,13 @@ class MidReceiverNode(
             // logger.error("MID Receiver Node: midExtId is set to $midId")
             val rtpPacket = packetInfo.packetAs<RtpPacket>()
             rtpPacket.getHeaderExtension(midId)?.let { ext ->
-                streamInfo.receivedMid = true
                 val midValue = SdesHeaderExtension.getTextValue(ext)
-                logger.error("Found MID value $midValue in RTP packet.")
+                // logger.error("Found MID value $midValue in RTP packet.")
+                val midAssociation = MidAssociation(midValue, rtpPacket.ssrc)
+                streamInfo.addMidSsrcAssociation(midAssociation)
+                logger.error("${hashCode()} added received MidAssociation $midAssociation ")
+                logger.error("${hashCode()} MidAssociation store now: ${streamInfo.dumpMidAssociationStore()}")
+                streamInfo.receivedMid = true
             }
         }
     }

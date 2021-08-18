@@ -54,10 +54,8 @@ interface ReadOnlyStreamInformationStore : NodeStatsProducer {
     fun getLocalPrimarySsrc(secondarySsrc: Long): Long?
     fun getRemoteSecondarySsrc(primarySsrc: Long, associationType: SsrcAssociationType): Long?
 
-    /**
-     * The MID string identifying the RTP stream.
-     */
-    val mid: String
+    fun getMidBySsrc(ssrc: Long): String?
+    fun dumpMidAssociationStore(): String
 
     /**
      * All signaled receive SSRCs
@@ -99,6 +97,10 @@ interface StreamInformationStore : ReadOnlyStreamInformationStore {
     fun addReceiveSsrc(ssrc: Long, mediaType: MediaType)
     fun removeReceiveSsrc(ssrc: Long)
 
+    fun addMidSsrcAssociation(midSsrcAssociation: MidAssociation)
+    fun addMediaTypeMid(type: MediaType, mid: String)
+    fun addLocalSsrc(type: MediaType, ssrc: Long)
+
     var receivedMid: Boolean
 }
 
@@ -126,7 +128,7 @@ class StreamInformationStoreImpl : StreamInformationStore {
     override val primaryVideoSsrcs: Set<Long>
         get() = receiveSsrcStore.primaryVideoSsrcs
 
-    override var mid: String = ""
+    private val midSsrcAssociations = MidAssociationStore()
 
     // Support for FIR, PLI, REMB and TCC is declared per-payload type, but currently our code is not payload-type
     // aware. So until this changes we will just check if any of the PTs supports the relevant feedback.
@@ -232,4 +234,20 @@ class StreamInformationStoreImpl : StreamInformationStore {
         addBoolean("supports_pli", supportsPli)
         addBoolean("supports_fir", supportsFir)
     }
+
+    override fun addMediaTypeMid(type: MediaType, mid: String) {
+        midSsrcAssociations.addMediaTypeMid(type, mid)
+    }
+
+    override fun addLocalSsrc(type: MediaType, ssrc: Long) {
+        midSsrcAssociations.addLocalSsrc(type, ssrc)
+    }
+
+    override fun addMidSsrcAssociation(midSsrcAssociation: MidAssociation) {
+        midSsrcAssociations.addMidAssociation(midSsrcAssociation)
+    }
+
+    override fun getMidBySsrc(ssrc: Long) = midSsrcAssociations.getMidbySsrc(ssrc)
+
+    override fun dumpMidAssociationStore(): String = midSsrcAssociations.toString()
 }

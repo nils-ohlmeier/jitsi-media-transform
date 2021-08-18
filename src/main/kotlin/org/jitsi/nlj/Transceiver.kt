@@ -28,6 +28,7 @@ import org.jitsi.nlj.stats.TransceiverStats
 import org.jitsi.nlj.transform.NodeStatsProducer
 import org.jitsi.nlj.util.Bandwidth
 import org.jitsi.nlj.util.LocalSsrcAssociation
+import org.jitsi.nlj.util.MidAssociation
 import org.jitsi.nlj.util.ReadOnlyStreamInformationStore
 import org.jitsi.nlj.util.SsrcAssociation
 import org.jitsi.nlj.util.StreamInformationStoreImpl
@@ -190,22 +191,25 @@ class Transceiver(
         streamInformationStore.removeReceiveSsrc(ssrc)
     }
 
-    fun setMediaId(mid: String) {
-        logger.cinfo { "Transceiver ${hashCode()} setting MID to $mid" }
-        streamInformationStore.mid = mid
+    fun addMediaId(type: MediaType, mid: String) {
+        logger.cinfo { "Transceiver ${hashCode()} adding MID $mid for $type" }
+        streamInformationStore.addMediaTypeMid(type, mid)
     }
 
-    fun getMediaId(): String {
-        return streamInformationStore.mid
+    fun addMidAssociation(mid: MidAssociation) {
+        logger.cinfo { "Transceiver ${hashCode()} adding MID ${mid.mid} for SSRC ${mid.ssrc}" }
+        streamInformationStore.addMidSsrcAssociation(mid)
     }
 
     /**
      * Set the 'local' bridge SSRC to [ssrc] for [mediaType]
      */
     fun setLocalSsrc(mediaType: MediaType, ssrc: Long) {
+        logger.cinfo { "Transceiver ${hashCode()} for $mediaType setting SSRC to $ssrc" }
         val localSsrcSetEvent = SetLocalSsrcEvent(mediaType, ssrc)
         rtpSender.handleEvent(localSsrcSetEvent)
         rtpReceiver.handleEvent(localSsrcSetEvent)
+        streamInformationStore.addLocalSsrc(mediaType, ssrc)
     }
 
     fun receivesSsrc(ssrc: Long): Boolean = streamInformationStore.receiveSsrcs.contains(ssrc)
