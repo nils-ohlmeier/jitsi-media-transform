@@ -28,7 +28,7 @@ class MidSenderNode(
     override fun modify(packetInfo: PacketInfo): PacketInfo {
         // logger.error("MID Sender Node: modify() called")
         midExtId?.let { midId ->
-            logger.error("MID Sender Node ${hashCode()}: midExtId is set to $midId")
+            // logger.error("MID Sender Node ${hashCode()}: midExtId is set to $midId")
             val rtpPacket = packetInfo.packetAs<RtpPacket>()
             midValue = streamInfo.getMidBySsrc(rtpPacket.ssrc)
             if (midValue.isNullOrEmpty()) {
@@ -39,7 +39,7 @@ class MidSenderNode(
             val ext = rtpPacket.getHeaderExtension(midId)
                 ?: rtpPacket.addHeaderExtension(midId, midValue!!.length)
             SdesHeaderExtension.setTextValue(ext, midValue!!)
-            logger.error("MID Sender Node ${hashCode()}: MID value set to $midValue")
+            logger.error("MID Sender Node ${hashCode()}: MID value set to $midValue for SSRC ${rtpPacket.ssrc}")
         }
         return packetInfo
     }

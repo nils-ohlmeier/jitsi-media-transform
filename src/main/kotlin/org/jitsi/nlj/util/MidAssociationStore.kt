@@ -45,6 +45,5 @@ class MidAssociationStore {
     fun getMidbySsrc(ssrc: Long): String? =
         midAssociationBySsrc.get(ssrc)
 
-    override fun toString(): String = audioMid + audioSsrc.toString() + videoMid + videoSsrc.toString() +
-        midAssociationBySsrc.toString()
+    override fun toString(): String = midAssociationBySsrc.toString()
 }
